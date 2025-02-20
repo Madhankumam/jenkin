@@ -1,9 +1,12 @@
 pipeline {
     agent any
-    triggers {
-        sqsTrigger(queue: 's3-queue')
-    }
     stages {
+        stage('Checkout') {
+            steps {
+                // Checkout code from GitHub
+                git branch: 'main', url: 'https://github.com/Madhankumam/jenkin.git'
+            }
+        }
         stage('Build Docker Image') {
             steps {
                 script {
