@@ -1,0 +1,27 @@
+pipeline {
+    agent any
+    triggers {
+        sqsTrigger(queue: 's3-queue')
+    }
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build Docker image
+                    sh 'docker build -t sample/jenkinrepo .'
+                }
+            }
+        }
+        stage('Push to ECR') {
+            steps {
+                script {
+                    // Authenticate Docker to ECR
+                    sh 'aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 390402546560.dkr.ecr.ap-south-1.amazonaws.com'
+                    // Tag and push Docker image
+                    sh 'docker tag sample/jenkinrepo:latest 390402546560.dkr.ecr.ap-south-1.amazonaws.com/sample/jenkinrepo:latest'
+                    sh 'docker push 390402546560.dkr.ecr.ap-south-1.amazonaws.com/sample/jenkinrepo:latest'
+                }
+            }
+        }
+    }
+}
